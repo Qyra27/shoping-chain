@@ -1,177 +1,203 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
+import { useContract } from './hooks/useContract'; 
 import { nativeToScVal } from "@stellar/stellar-sdk";
-import { useContract } from "./hooks/useContract";
 
-// - Styles --------------------------
-const s = {
-  app: { maxWidth: 600, margin: "0 auto", padding: "2rem 1.5rem", fontFamily: "system-ui, sans-serif" },
-  header: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem", paddingBottom: "1rem", borderBottom: "1px solid #e5e7eb" },
-  title: { fontSize: "1.25rem", fontWeight: 700, margin: 0 },
-  btnPrimary: { background: "#6366f1", color: "#fff", border: "none", padding: "0.5rem 1.1rem", borderRadius: 8, cursor: "pointer", fontWeight: 500 },
-  btnOutline: { background: "transparent", color: "#374151", border: "1px solid #d1d5db", padding: "0.5rem 1.1rem", borderRadius: 8, cursor: "pointer" },
-  btnDanger: { background: "#ef4444", color: "#fff", border: "none", padding: "0.35rem 0.8rem", borderRadius: 6, cursor: "pointer", fontSize: "0.8rem" },
-  walletInfo: { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 },
-  address: { fontSize: "0.8rem", color: "#6b7280", fontFamily: "monospace", background: "#f3f4f6", padding: "0.4rem 0.75rem", borderRadius: 6 },
-  balance: { fontSize: "0.75rem", color: "#6366f1", fontWeight: 600 },
-  walletRow: { display: "flex", alignItems: "center", gap: 10 },
-  card: { background: "#fff", border: "1px solid #e5e7eb", borderRadius: 10, padding: "1.25rem", marginBottom: "0.75rem" },
-  form: { background: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: 10, padding: "1.25rem", marginBottom: "1.5rem" },
-  input: { width: "100%", border: "1px solid #d1d5db", borderRadius: 7, padding: "0.55rem 0.75rem", fontSize: "0.95rem", boxSizing: "border-box", marginBottom: "0.75rem", outline: "none" },
-  label: { display: "block", fontSize: "0.8rem", fontWeight: 600, color: "#374151", marginBottom: "0.3rem" },
-  error: { color: "#ef4444", fontSize: "0.85rem", margin: "0.5rem 0" },
-  success: { color: "#16a34a", fontSize: "0.85rem", margin: "0.5rem 0" },
-  noteTitle: { margin: "0 0 0.3rem", fontSize: "1rem", fontWeight: 600 },
-  noteBody: { margin: "0 0 0.75rem", color: "#6b7280", fontSize: "0.9rem" },
-  noteFooter: { display: "flex", justifyContent: "space-between", alignItems: "center" },
-  noteId: { fontSize: "0.7rem", color: "#9ca3af", fontFamily: "monospace" },
-  sectionTitle: { fontWeight: 600, marginBottom: "1rem", color: "#111827" },
-  empty: { textAlign: "center", color: "#9ca3af", padding: "2rem 0", fontSize: "0.9rem" },
-};
-
-export default function App() {
-  // - Hook - semua fungsi wallet & contract ada di sini ---
+function App() {
   const {
     publicKey,
     isWalletConnected,
-    walletLoading,
-    walletError,
+    xlmBalance,
     connectWallet,
     disconnectWallet,
     readContract,
     writeContract,
     txLoading,
-    txError,
-    txSuccess,
-    xlmBalance,
+    txError
   } = useContract();
 
-  // - State lokal ----------------------
-  const [notes, setNotes] = useState([]);
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [products, setProducts] = useState([]);
+  const [newProductName, setNewProductName] = useState('');
+  const [newProductPrice, setNewProductPrice] = useState('');
+  const [loadingProducts, setLoadingProducts] = useState(false);
 
-  // Load notes saat pertama kali halaman dibuka
+  const fetchProducts = async () => {
+    setLoadingProducts(true);
+    try {
+      const result = await readContract("get_products");
+      setProducts(result || []);
+    } catch (err) {
+      console.error("Gagal ambil produk:", err);
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
+
   useEffect(() => {
-    loadNotes();
+    fetchProducts();
   }, []);
 
-  // - Fungsi-fungsi ---------------------
+  const handleAddProduct = async (e) => {
+    e.preventDefault();
+    if (!isWalletConnected) return alert("Koneksikan wallet dulu!");
+    try {
+      const args = [
+        nativeToScVal(publicKey, { type: "address" }),
+        nativeToScVal(newProductName, { type: "string" }),
+        nativeToScVal(Number(newProductPrice), { type: "u64" }),
+      ];
+      await writeContract("create_product", args);
+      alert("Produk berhasil didaftarkan!");
+      setNewProductName('');
+      setNewProductPrice('');
+      fetchProducts();
+    } catch (err) {
+      console.error("Gagal tambah produk:", err);
+    }
+  };
 
-  async function loadNotes() {
-    const data = await readContract("get_notes");
-    setNotes(data || []);
-  }
+  const handleBuyProduct = async (id) => {
+    if (!isWalletConnected) return alert("Koneksikan wallet dulu!");
+    try {
+      const args = [
+        nativeToScVal(publicKey, { type: "address" }),
+        nativeToScVal(id, { type: "u64" }),
+      ];
+      await writeContract("buy_product", args);
+      alert("Pembelian berhasil!");
+      fetchProducts();
+    } catch (err) {
+      console.error("Gagal beli:", err);
+    }
+  };
 
-  async function handleCreate() {
-    await writeContract("create_note", [
-      nativeToScVal(title, { type: "string" }),
-      nativeToScVal(content, { type: "string" }),
-    ]);
-    setTitle("");
-    setContent("");
-    await loadNotes();
-  }
+  // --- Styles ---
+  const styles = {
+    container: { backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: "'Inter', sans-serif", color: '#1e293b' },
+    nav: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 5%', backgroundColor: '#ffffff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', position: 'sticky', top: 0, zIndex: 100 },
+    logo: { fontSize: '1.5rem', fontWeight: 'bold', color: '#3b82f6', display: 'flex', alignItems: 'center', gap: '10px' },
+    walletCard: { display: 'flex', alignItems: 'center', gap: '15px' },
+    btnPrimary: { backgroundColor: '#3b82f6', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', transition: '0.3s' },
+    btnOutline: { backgroundColor: 'transparent', border: '1px solid #e2e8f0', padding: '6px 12px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem' },
+    hero: { textAlign: 'center', padding: '60px 20px', background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)', color: 'white', marginBottom: '40px' },
+    section: { maxWidth: '1100px', margin: '0 auto', padding: '0 20px' },
+    cardGrid: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '25px', marginBottom: '50px' },
+    productCard: { backgroundColor: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', border: '1px solid #f1f5f9', transition: 'transform 0.2s' },
+    formCard: { backgroundColor: 'white', padding: '25px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)', marginBottom: '40px', maxWidth: '500px', margin: '0 auto 40px auto' },
+    input: { width: '100%', padding: '12px', marginBottom: '10px', borderRadius: '6px', border: '1px solid #e2e8f0', boxSizing: 'border-box' },
+    badge: { fontSize: '0.7rem', padding: '4px 8px', borderRadius: '12px', backgroundColor: '#eff6ff', color: '#3b82f6', fontWeight: 'bold' }
+  };
 
-  async function handleDelete(id) {
-    await writeContract("delete_note", [
-      nativeToScVal(id, { type: "u64" }),
-    ]);
-    await loadNotes();
-  }
-
-  // - UI ---------------------------
   return (
-    <div style={s.app}>
-
-      {/* Header */}
-      <div style={s.header}>
-        <h1 style={s.title}>Notes DApp</h1>
-
-        {isWalletConnected ? (
-          <div style={s.walletInfo}>
-            <div style={s.walletRow}>
-              <span style={s.address}>
-                {publicKey.slice(0, 6)}...{publicKey.slice(-6)}
-              </span>
-              <button style={s.btnOutline} onClick={disconnectWallet}>
-                Disconnect
-              </button>
+    <div style={styles.container}>
+      {/* Navbar */}
+      <nav style={styles.nav}>
+        <div style={styles.logo}>🛒 QYRA STORE</div>
+        <div style={styles.walletCard}>
+          {isWalletConnected && (
+            <div style={{ textAlign: 'right', display: 'none', display: 'block' }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>{xlmBalance} XLM</div>
+              <div style={{ fontSize: '0.7rem', color: '#64748b' }}>{publicKey.substring(0, 6)}...{publicKey.substring(52)}</div>
             </div>
-            {xlmBalance !== null && (
-              <span style={s.balance}>
-                {parseFloat(xlmBalance).toFixed(2)} XLM
-              </span>
-            )}
-          </div>
-        ) : (
-          <button style={s.btnPrimary} onClick={connectWallet} disabled={walletLoading}>
-            {walletLoading ? "Connecting..." : "Connect Wallet"}
-          </button>
-        )}
-      </div>
-
-      {/* Error & status transaksi */}
-      {walletError && <p style={s.error}>⚠ {walletError}</p>}
-      {txError && <p style={s.error}>⚠ {txError}</p>}
-      {txSuccess && <p style={s.success}>✓ Transaction confirmed!</p>}
-
-      {/* Form buat note - hanya muncul kalau wallet sudah connect */}
-      {isWalletConnected && (
-        <div style={s.form}>
-          <p style={s.sectionTitle}>New Note</p>
-
-          <label style={s.label}>Title</label>
-          <input
-            style={s.input}
-            placeholder="Enter title..."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-
-          <label style={s.label}>Content</label>
-          <input
-            style={s.input}
-            placeholder="Enter content..."
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-          />
-
-          <button
-            style={s.btnPrimary}
-            onClick={handleCreate}
-            disabled={txLoading || !title || !content}
-          >
-            {txLoading ? "Saving..." : "Save Note"}
-          </button>
+          )}
+          {!isWalletConnected ? (
+            <button onClick={connectWallet} style={styles.btnPrimary}>Connect Wallet</button>
+          ) : (
+            <button onClick={disconnectWallet} style={styles.btnOutline}>Logout</button>
+          )}
         </div>
-      )}
+      </nav>
 
-      {/* Daftar notes */}
-      <p style={s.sectionTitle}>All Notes ({notes.length})</p>
+      {/* Hero Section */}
+      <header style={styles.hero}>
+        <h1 style={{ fontSize: '2.5rem', marginBottom: '10px' }}>Blockchain Market</h1>
+        <p style={{ opacity: 0.9 }}>Beli dan jual barang secara aman di jaringan Stellar Soroban.</p>
+      </header>
 
-      {notes.length === 0 ? (
-        <p style={s.empty}>No notes yet.</p>
-      ) : (
-        notes.map((note) => (
-          <div key={note.id} style={s.card}>
-            <h3 style={s.noteTitle}>{note.title}</h3>
-            <p style={s.noteBody}>{note.content}</p>
-            <div style={s.noteFooter}>
-              <span style={s.noteId}>id: {note.id?.toString()}</span>
-              {isWalletConnected && (
-                <button
-                  style={s.btnDanger}
-                  onClick={() => handleDelete(note.id)}
-                  disabled={txLoading}
-                >
-                  Delete
-                </button>
-              )}
-            </div>
+      <main style={styles.section}>
+        {/* Form Tambah Produk */}
+        <div style={styles.formCard}>
+          <h3 style={{ marginTop: 0, marginBottom: '20px' }}>Daftarkan Produk Baru</h3>
+          <form onSubmit={handleAddProduct}>
+            <input 
+              style={styles.input}
+              placeholder="Nama Barang (contoh: Kopi Luwak)" 
+              value={newProductName}
+              onChange={(e) => setNewProductName(e.target.value)}
+              required
+            />
+            <input 
+              style={styles.input}
+              type="number" 
+              placeholder="Harga dalam XLM" 
+              value={newProductPrice}
+              onChange={(e) => setNewProductPrice(e.target.value)}
+              required
+            />
+            <button type="submit" disabled={txLoading} style={{...styles.btnPrimary, width: '100%', marginTop: '10px', backgroundColor: txLoading ? '#94a3b8' : '#3b82f6' }}>
+              {txLoading ? "Memproses..." : "Konfirmasi Jual"}
+            </button>
+          </form>
+          {txError && <p style={{ color: '#ef4444', fontSize: '0.8rem', marginTop: '10px' }}>⚠️ {txError}</p>}
+        </div>
+
+        {/* List Produk */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2 style={{ fontSize: '1.5rem' }}>Eksplor Produk</h2>
+          <button onClick={fetchProducts} style={styles.btnOutline}>🔄 Refresh</button>
+        </div>
+
+        {loadingProducts ? (
+          <div style={{ textAlign: 'center', padding: '40px' }}>Memuat data dari blockchain...</div>
+        ) : (
+          <div style={styles.cardGrid}>
+            {products.length === 0 && (
+              <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '40px', color: '#94a3b8' }}>
+                Belum ada produk yang dijual saat ini.
+              </div>
+            )}
+            {products.map((p) => (
+              <div key={p.id.toString()} style={styles.productCard} className="hover-card">
+                <div style={{ height: '160px', backgroundColor: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>
+                  📦
+                </div>
+                <div style={{ padding: '20px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '10px' }}>
+                    <h3 style={{ margin: 0, fontSize: '1.2rem' }}>{p.name}</h3>
+                    <span style={styles.badge}>ID: {p.id.toString()}</span>
+                  </div>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#059669', marginBottom: '15px' }}>
+                    {p.price.toString()} <span style={{ fontSize: '0.9rem', color: '#64748b' }}>XLM</span>
+                  </div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '20px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    Seller: {p.seller.substring(0, 10)}...
+                  </div>
+                  
+                  <button 
+                    onClick={() => handleBuyProduct(p.id)}
+                    disabled={txLoading || p.seller === publicKey}
+                    style={{ 
+                      ...styles.btnPrimary, 
+                      width: "100%", 
+                      backgroundColor: p.seller === publicKey ? '#f1f5f9' : '#3b82f6',
+                      color: p.seller === publicKey ? '#94a3b8' : 'white',
+                      cursor: (txLoading || p.seller === publicKey) ? 'not-allowed' : 'pointer',
+                      border: p.seller === publicKey ? '1px solid #e2e8f0' : 'none'
+                    }}
+                  >
+                    {p.seller === publicKey ? "Barang Milik Anda" : "Beli Sekarang"}
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-        ))
-      )}
-
+        )}
+      </main>
+      
+      <footer style={{ textAlign: 'center', padding: '40px', color: '#94a3b8', fontSize: '0.8rem' }}>
+        Built on Stellar Soroban • 2026
+      </footer>
     </div>
   );
 }
+
+export default App;
