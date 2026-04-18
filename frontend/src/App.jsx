@@ -20,11 +20,20 @@ function App() {
   const [newProductPrice, setNewProductPrice] = useState('');
   const [loadingProducts, setLoadingProducts] = useState(false);
 
+  const parseProducts = (scVal) => {
+    return scVal.map(p => ({
+      id: Number(p.id),
+      seller: p.seller,
+      name: p.name,
+      price: Number(p.price),
+    }));
+  }
+
   const fetchProducts = async () => {
     setLoadingProducts(true);
     try {
       const result = await readContract("get_products");
-      setProducts(result || []);
+      setProducts(result ? parseProducts(result) : []);
     } catch (err) {
       console.error("Gagal ambil produk:", err);
     } finally {
@@ -70,7 +79,7 @@ function App() {
     }
   };
 
-  // --- Styles ---
+  // Styles (sama seperti sebelumnya)
   const styles = {
     container: { backgroundColor: '#f8fafc', minHeight: '100vh', fontFamily: "'Inter', sans-serif", color: '#1e293b' },
     nav: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 5%', backgroundColor: '#ffffff', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', position: 'sticky', top: 0, zIndex: 100 },
@@ -87,7 +96,7 @@ function App() {
     badge: { fontSize: '0.7rem', padding: '4px 8px', borderRadius: '12px', backgroundColor: '#eff6ff', color: '#3b82f6', fontWeight: 'bold' }
   };
 
-  return (
+ return (
     <div style={styles.container}>
       {/* Navbar */}
       <nav style={styles.nav}>
