@@ -1,65 +1,63 @@
-# Stellar Notes DApp
+# Stellar Shoping Chain DApp
 
-**Stellar Notes DApp** - Blockchain-Based Decentralized Note-Taking System
+**Stellar Shoping Chain DApp** - Decentralized Marketplace on Stellar Blockchain
 
 ## Project Description
 
-Stellar Notes DApp is a decentralized smart contract solution built on the Stellar blockchain using Soroban SDK. It provides a secure, immutable platform for managing personal notes directly on the blockchain. The contract ensures that your data is stored transparently and is only manageable through predefined smart contract functions, eliminating reliance on centralized database providers.
+Stellar Shoping Chain is a decentralized smart contract solution built on the Stellar blockchain using the Soroban SDK. It enables users to sell, buy, and manage products securely and transparently on-chain. The contract ensures that all product data and transactions are handled through predefined smart contract functions, eliminating reliance on centralized servers or databases.
 
-The system allows users to create, view, and delete notes, leveraging the efficiency and security of the Stellar network. Each note is uniquely identified and stored within the contract's instance storage, ensuring data persistence and reliability.
+Each product has a unique ID and is stored permanently in the contract’s storage, ensuring security, reliability, and data integrity.
 
 ## Project Vision
 
-Our vision is to revolutionize personal productivity in the digital age by:
+Our vision is to build a decentralized e-commerce ecosystem that:
 
-- **Decentralizing Data**: Moving note-taking from centralized servers to a global, distributed blockchain
-- **Ensuring Ownership**: Empowering users to have complete control and ownership over their digital thoughts and information
-- **Guaranteeing Immutability**: Providing a permanent, tamper-proof record of notes that cannot be altered or deleted by third parties
-- **Enhancing Privacy**: Leveraging blockchain security to protect personal information from unauthorized access
-- **Building Trustless Systems**: Creating a platform where data integrity is guaranteed by code, not by company promises
+- **Empowers Ownership**: Sellers and buyers have full control over their products and transactions
+- **Guarantees Transparency**: All marketplace activities can be verified on-chain
+- **Ensures Security**: Protects against fraud or data manipulation by third parties
+- **Enables Open Access**: Marketplace accessible globally without intermediaries
+- **Creates Trustless Systems**: Data integrity guaranteed by code, not company promises
 
-We envision a future where digital information is truly personal and sovereign, empowering individuals with complete autonomy over their digital assets.
+We envision a future where e-commerce is fair, transparent, and fully secure for all participants.
 
 ## Key Features
 
-### 1. **Simple Note Creation**
+### 1. **Product Listing**
 
-- Create notes with just one function call
-- Specify title and content for each note
-- Automated ID generation for unique identification
-- Persistent storage on the Stellar blockchain
+- Add products with a single function call
+- Specify product name and price
+- Automatic unique ID generation
+- Persistent storage on Stellar blockchain
 
-### 2. **Efficient Data Retrieval**
+### 2. **2. Browse Products**
 
-- Fetch all stored notes in a single call
-- Structured data representation for easy frontend integration
-- Quick access to your entire note collection
-- Real-time synchronization with the blockchain state
+- Fetch all available products in one call
+- Structured data format for easy frontend integration
+- Quick access to the full product catalog
 
-### 3. **Secure Deletion**
+### 3. **Purchase Products**
 
-- Remove specific notes using their unique IDs
-- Permanent removal from the contract storage
-- Clean and efficient storage management
-- Immediate update of the note list after deletion
+- Buy products by their unique ID
+- Users cannot buy their own products
+- Product is permanently removed from storage upon purchase
+- Marketplace state updates immediately after transactions
 
 ### 4. **Transparency and Security**
 
-- View all note activities on the blockchain
-- Blockchain-based verification of all storage actions
-- Immutable records of note creation and deletion
-- Protected against unauthorized modifications
+- All marketplace actions recorded on blockchain
+- On-chain verification of product listings and purchases
+- Immutable records prevent unauthorized changes
 
 ### 5. **Stellar Network Integration**
 
-- Leverages the high speed and low cost of Stellar
-- Built using the modern Soroban Smart Contract SDK
-- Scalable architecture for growing note collections
+- High-speed, low-cost Stellar transactions
+- Built with Soroban Smart Contract SDK
+- Scalable for growing product catalogs
 - Interoperable with other Stellar-based services
 
 ## Contract Details
 
-Contract Address: CAWLJENIINEZJFQFC5VCB6VNRVJGSXO2L7DORGXLDNVBKT26RRHTUQFJ
+Contract Address: CBIH5CKXJMCJALNSLXTQB55ZSJHHIEVLTJPA4ABLOA6JUEBCUVRRHNRK
   ![alt text](smartcontract.png)
 
 ## Frontend Preview
@@ -70,36 +68,32 @@ Contract Address: CAWLJENIINEZJFQFC5VCB6VNRVJGSXO2L7DORGXLDNVBKT26RRHTUQFJ
 
 ### Short-Term Enhancements
 
-1. **Note Encryption**: Support for end-to-end encryption of note content for enhanced privacy
-2. **Category Management**: Add tags and categories to organize notes efficiently
-3. **Rich Text Support**: Extend support beyond plain text to include Markdown and formatted content
-4. **Search Functionality**: Implement advanced search filters for large note collections
+1. **Product Categories**: Add tags or categories for better organization
+2. **Rich Descriptions**: Support for detailed product descriptions and formatted text
+3. **Search Functionality**: Advanced search filters for large catalogs
+4. **User Ratings & Reviews**: Build seller reputation
 
 ### Medium-Term Development
 
-5. **Collaborative Notes**: Implement multi-signature requirements for shared or collaborative note-taking
-   - Shared access for multiple addresses
-   - Permission-based editing and viewing
-   - Version history tracking
-6. **Notification System**: Off-chain bridge to alert users of new updates or shared notes
-7. **Asset Attachment**: Capability to attach digital assets or tokens to specific notes
-8. **Inter-Contract Integration**: Allow other smart contracts to interact with and store data in the notes contract
+5. **Promotions & Discounts**: Support vouchers and discounts
+6. **Notification System**: Off-chain notifications for purchases or new products
+7. **Digital Asset Integration**: Attach NFTs or tokens to products
+8. **Inter-Contract Integration**: Allow other smart contracts to interact with products
 
 ### Long-Term Vision
 
-9. **Cross-Chain Synchronization**: Extend note storage to multiple blockchain networks
-10. **Decentralized UI Hosting**: Host the frontend on IPFS or similar decentralized platforms
-11. **AI-Powered Summarization**: Optional integration with AI to help users summarize their notes
-12. **Privacy Layers**: Implement zero-knowledge proofs for completely private note content
-13. **DAO Governance**: Community-driven protocol improvements and feature prioritization
-14. **Identity Management**: Integration with decentralized identity (DID) systems for user management
+9. **Cross-Chain Marketplace**: Extend product listings to multiple blockchains
+10. **Decentralized Frontend Hosting**: Host frontend on IPFS or similar platforms
+11. **AI Recommendations**: Suggest products to buyers using AI
+12. **DAO Governance**: Community-driven feature prioritization and upgrades
+13. **Decentralized Identity (DID)**: Integration for user management
 
 ### Enterprise Features
 
-15. **Corporate Documentation**: Adapt the system for secure corporate record-keeping
-16. **Immutable Logging**: Create time-locked logs for audit purposes
-17. **Automated Reporting**: Automatic note triggers for periodic reporting
-18. **Multi-Language Support**: Expand accessibility with internationalization
+14. **Corporate Marketplaces**: Adapt for internal business or inventory management
+15. **Immutable Transaction Logging**: Time-stamped logs for auditing
+16. **Automated Reporting**: Trigger-based sales reports
+17. **Multi-Language Support**: Expand accessibility globally
 
 ---
 
@@ -111,12 +105,12 @@ Contract Address: CAWLJENIINEZJFQFC5VCB6VNRVJGSXO2L7DORGXLDNVBKT26RRHTUQFJ
 
 ## Getting Started
 
-Deploy the smart contract to Stellar's Soroban network and interact with it using the three main functions:
+Deploy the smart contract to the Soroban Stellar network and interact with it using the three main functions:
 
-- `create_note()` - Create a new note with a title and content
-- `get_notes()` - Retrieve all stored notes from the contract
-- `delete_note()` - Remove a specific note by its ID
+- `create_product()` – Add a new product with name and price
+- `get_products()` – Retrieve all products stored in the contract
+- `buy_product()` – Purchase a product by its unique ID
 
 ---
 
-**Stellar Notes DApp** - Securing Your Thoughts on the Blockchain
+**Stellar Shoping Chain DApp** – Secure, Transparent, and Decentralized Marketplace
